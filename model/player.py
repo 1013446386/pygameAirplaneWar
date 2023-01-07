@@ -1,8 +1,9 @@
 import random
 from enum import Enum
 
-from base.config import Config
 import pygame
+
+from base.config import Config
 
 
 # 玩家类
@@ -25,8 +26,8 @@ class Player(pygame.sprite.Sprite):
 
     class PlayerState(Enum):
         Max = 1
-        Injured = 2
-        Seriously = 3
+        Reach = 2
+        Injured = 3
         Death = 4
 
     def __init__(self, playerImgList, sound: pygame.mixer.Sound):
@@ -44,6 +45,7 @@ class Player(pygame.sprite.Sprite):
 
         self.HP = Config.PlayerHP
         self.state = Player.PlayerState.Max
+        self.score = 0
 
     def reStart(self):
         # 对象x轴中心点
@@ -51,6 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = Config.PlayerInitPos.y
         self.HP = Config.PlayerHP
         self.state = Player.PlayerState.Max
+        self.score = 0
 
     def move(self):
         # 检测按键按下
@@ -77,6 +80,9 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > Config.DisplayWH[1]:
             self.rect.bottom = Config.DisplayWH[1]
 
+    def hitEvent(self):
+        self.score += Config.PlayerAddScoreStep
+
     def collideEvent(self):
         self.HP -= Config.PlayerStepSubHP
         if self.HP > 0:
@@ -86,13 +92,16 @@ class Player(pygame.sprite.Sprite):
         return self.state
 
     def collideMe(self):
-        print("小心！还剩下", self.HP)
         self.state = self.PlayerState.Injured
 
     def killMe(self):
-        print("死了！")
-        self.sound.play()
-        self.state = self.PlayerState.Death
+        if self.state == self.PlayerState.Reach:
+            return
+        if self.state != self.PlayerState.Death:
+            self.state = self.PlayerState.Death
+            print("死亡")
+            self.sound.play()
+            self.score = 0
 
     def draw(self):
         pass

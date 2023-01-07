@@ -7,6 +7,7 @@ from base.xoy import XoY  # 存基本信息的数据类
 
 def get_dir_path():
     if getattr(sys, 'frozen', False):
+        # noinspection PyProtectedMember
         cur_path = sys._MEIPASS
     else:
         cur_path = os.getcwd()
@@ -39,6 +40,11 @@ class Config:
     if Le:
         PlayerStepSubHP = 0
 
+    PlayerAddScoreStep = 10
+    if Le:
+        PlayerAddScoreStep = 100
+    PlayerScoreMax = 13000
+
     BulletSpeedY = 7  # 子弹速度
     BulletKill = not Le  # 子弹击中目标后是否失效
 
@@ -58,4 +64,6 @@ class Config:
     BtnInitPos.y = DisplayWH[1] / 2 - 22.5
 
     FPSPos = (0, 0)
-    HPPos = (0, 88)
+    HPPos = (0, 30)
+    ScorePos = (0, 60)
+    ScoreMaxPos = (0, 90)

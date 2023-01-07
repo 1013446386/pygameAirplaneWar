@@ -1,12 +1,12 @@
 import os
-
-from base.color import Color
-from base.resources import Resources
-from base.button import Button
-from base.config import Config
 import sys
+
 import pygame
 
+from base.button import Button
+from base.color import Color
+from base.config import Config
+from base.resources import Resources
 from model.obstacle import Obstacle
 from model.player import Player
 
@@ -18,6 +18,7 @@ class Display:
 
         pygame.init()  # 必须初始化！！
         pygame.mixer.init()  # 声音初始化
+        pygame.font.init()  # 文字初始化
         # 设置标题
         pygame.display.set_caption(Config.DisplayTitle)
         # 时钟（设置FPS）
@@ -27,7 +28,7 @@ class Display:
 
         # 资源加载
         self.resources = Resources()
-
+        pygame.display.set_icon(self.resources.ico)
         self.__running = True
         self.__pause = False
 
@@ -40,7 +41,7 @@ class Display:
         # 创建继续按钮
         self.resumeBtn = Button(Config.BtnInitPos.x, Config.BtnInitPos.y, None, self.resources.resumeImgList[0],
                                 self.resources.resumeImgList[0], self.resources.resumeImgList[1],
-                                self.play, self.resources.btnFont, (255, 0, 0))
+                                self.play, self.resources.enFont, (255, 0, 0))
         # 玩家对象
         self.player = Player(self.resources.playerImgList, self.resources.killSound)
         self.spritesAdd(self.allSprites, self.player)
@@ -80,15 +81,13 @@ class Display:
         pygame.mixer_music.play()
 
     def reStart(self):
+        self.pause()
         # 重新开始
         for i in self.allObstacles:
             i.reStart()
         for i in self.allBullets:
             i.kill()
-        if self.player.state != Player.PlayerState.Death:
-            self.player.killMe()
-        pygame.time.delay(3)
-        self.pause()
+        self.player.killMe()
         self.player.reStart()
 
     # 监听按键事件
@@ -100,7 +99,8 @@ class Display:
                 if event.key == pygame.K_SPACE:  # 按下空格键
                     if self.__pause:  # 如果是暂停状态则取消暂停
                         self.play()
-                    self.launch()  # 发射子弹函数
+                    else:
+                        self.launch()  # 发射子弹函数
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_b:
                     if self.__pause:  # 如果是暂停状态则取消暂停
                         self.play()
@@ -118,20 +118,16 @@ class Display:
                 elif event.type == pygame.MOUSEBUTTONUP:  # 鼠标弹起
                     self.resumeBtn.mouseUp()
 
-    def pauseEvent(self):
-        # self.screen.blit(self.resources.resumeImg, (210, 327.5))
-        self.resumeBtn.draw(self.screen)
-
     # 碰撞检测
     def collide(self):
         collideDict = pygame.sprite.groupcollide(self.allObstacles, self.allBullets, False, Config.BulletKill)
         for i in collideDict:
+            self.player.hitEvent()
             i.collideMe()
 
         collideList = pygame.sprite.spritecollide(self.player, self.allObstacles, False)
         for o in collideList:
             o.collideMe()
-            self.resources.boomSound.play()
             if self.player.collideEvent() == self.player.PlayerState.Death:
                 self.reStart()
 
@@ -139,36 +135,59 @@ class Display:
         for i in Config.DisplayBGPos:
             # 更新屏幕背景 （不更新会有残影）
             self.screen.blit(self.resources.backgroundImg, i)
-        self.allSprites.draw(self.screen)  # 更新结果绘制到屏幕
-        fpsImage = self.resources.btnFont.render("FPS " + str(int(self.clock.get_fps())), True, Color.RED)
-        self.screen.blit(fpsImage, Config.FPSPos)
-        hpImage = self.resources.btnFont.render("HP " + str(self.player.HP), True, Color.RED)
+        self.allSprites.draw(self.screen)  # 绘制到屏幕
+        self.pauseDraw()
+        self.infoDraw()
+
+    def infoDraw(self):
+        img = self.resources.chFont.render("帧率:" + str(int(self.clock.get_fps())), True, Color.WHITE)
+        self.screen.blit(img, Config.FPSPos)
+        hpImage = self.resources.chFont.render("血量:" + str(self.player.HP), True, Color.WHITE)
         self.screen.blit(hpImage, Config.HPPos)
+        scoreImage = self.resources.chFont.render("分数:" + str(self.player.score), True, Color.WHITE)
+        self.screen.blit(scoreImage, Config.ScorePos)
+        scoreMaxImage = self.resources.chFont.render("目标:" + str(Config.PlayerScoreMax), True, Color.WHITE)
+        self.screen.blit(scoreMaxImage, Config.ScoreMaxPos)
+
+    def pauseDraw(self):
+        if self.__pause:
+            # self.screen.blit(self.resources.resumeImg, (210, 327.5))
+            self.resumeBtn.draw(self.screen)
+
+    def scoreListening(self):
+        if self.player.score >= Config.PlayerScoreMax and self.player.state != self.player.PlayerState.Death:
+            self.reachScore()
 
     def loop(self):
         # 必须循环，不然游戏就没了!
         while self.__running:
             self.clock.tick(Config.DisplayFPS)  # 设置每秒刷新帧数，不大于该值 但性能不足时会小于该值
             self.keyEvent()
-
             if not self.__pause:
                 if Config.Le:
                     self.launch()  # 不建议启用 发射频率与帧率相关，同时打开函数内按键按下检测
-                self.collide()  # 碰撞检测
+
                 # 调用所有对象的update函数
                 self.allSprites.update()
-                self.draw()
-            else:
-                self.pauseEvent()
+                self.collide()  # 碰撞检测
+                self.scoreListening()
+
+            self.draw()
             # 更新屏幕内容(翻转白板，将绘制完毕的界面显示至屏幕，可有效消除绘制拖影)
             pygame.display.flip()
 
     # 程序结束了！！
     def bey(self):
-        print("程序结束了！！!")
         self.__running = False
         pygame.quit()  # 卸载所有模块
         sys.exit()  # 终止程序，确保退出程序
+
+    def reachScore(self):
+        self.player.state = self.player.PlayerState.Reach
+        self.resources.reachSound.play()
+        print("成功！！")
+        self.pause()
+        self.reStart()
 
 
 if __name__ == '__main__':
