@@ -100,6 +100,7 @@ class Player(pygame.sprite.Sprite):
         if self.state != self.PlayerState.Death:
             self.state = self.PlayerState.Death
             print("死亡")
+            pygame.mixer.stop()
             self.sound.play()
             self.score = 0
 

@@ -1,5 +1,6 @@
 # 障碍物
 import random
+import threading
 from enum import Enum
 
 import pygame
@@ -32,7 +33,7 @@ class Obstacle(pygame.sprite.Sprite):
 
     def boom(self):
         # todo 被击中爆炸
-        self.sound.play()
+        threading.Thread(target=self.sound.play).start()
         self.reStart()
 
     # 按照预设下落

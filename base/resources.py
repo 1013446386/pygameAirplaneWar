@@ -1,6 +1,7 @@
 import os
 
 import pygame
+from pygame.mixer import Sound
 
 from base.config import Config
 from .color import Color
@@ -8,7 +9,6 @@ from .color import Color
 
 # 资源
 class Resources:
-
     def __init__(self):
         # 图片资源文件夹
         self.img_folder = os.path.join(Config.game_folder, 'resources/images')
@@ -34,7 +34,8 @@ class Resources:
         self.chFont = pygame.font.Font(os.path.join(self.font_folder, 'zcool-gdh_Regular.ttf'), 28)
 
         # 玩家资源
-        self.playerImgList = self.pngImgToList(["me1", "me2"])
+        # self.playerImgList = self.pngImgToList(["me3"])
+        self.playerImgList = self.pngImgToList(["me1"])
 
         # 子弹资源
         self.bulletImgList = self.pngImgToList(["bullet1", "bullet2", "bomb"])

@@ -9,7 +9,7 @@ from base.config import Config
 from base.resources import Resources
 from model.obstacle import Obstacle
 from model.player import Player
-
+import threading
 
 # 整体控制
 class Display:
@@ -55,9 +55,8 @@ class Display:
     # biu! biu! biu!!!
     def launch(self):
         if pygame.key.get_pressed()[pygame.K_SPACE]:  # 检测键盘按下了空格键
-            self.resources.biuSound.play()
-            for i in range(2):
-                self.spritesAdd(self.allBullets, Player.Bullet(self.player.rect.center, self.resources.bulletImgList))
+            threading.Thread(target=self.resources.biuSound.play).start()
+            self.spritesAdd(self.allBullets, Player.Bullet(self.player.rect.center, self.resources.bulletImgList))
 
     # 塞进组里，直接写会有警告⚠
     def spritesAdd(self, group: pygame.sprite.Group, obj):
@@ -97,11 +96,11 @@ class Display:
                 self.bey()
             elif event.type == pygame.KEYDOWN:  # 检测按键按下
                 if event.key == pygame.K_SPACE:  # 按下空格键
-                    if self.__pause:  # 如果是暂停状态则取消暂停
-                        self.play()
-                    else:
-                        self.launch()  # 发射子弹函数
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_b:
+                    if not self.__pause:  # 如果是暂停状态则取消暂停
+                        threading.Thread(target=self.launch).start()
+                        # self.launch()  # 发射子弹函数
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_b or\
+                        event.key == pygame.K_c or event.key == pygame.K_v:
                     if self.__pause:  # 如果是暂停状态则取消暂停
                         self.play()
                     else:
@@ -123,6 +122,7 @@ class Display:
         collideDict = pygame.sprite.groupcollide(self.allObstacles, self.allBullets, False, Config.BulletKill)
         for i in collideDict:
             self.player.hitEvent()
+            self.scoreListening()
             i.collideMe()
 
         collideList = pygame.sprite.spritecollide(self.player, self.allObstacles, False)
@@ -170,7 +170,6 @@ class Display:
                 # 调用所有对象的update函数
                 self.allSprites.update()
                 self.collide()  # 碰撞检测
-                self.scoreListening()
 
             self.draw()
             # 更新屏幕内容(翻转白板，将绘制完毕的界面显示至屏幕，可有效消除绘制拖影)
@@ -184,9 +183,8 @@ class Display:
 
     def reachScore(self):
         self.player.state = self.player.PlayerState.Reach
-        self.resources.reachSound.play()
-        print("成功！！")
-        self.pause()
+        pygame.mixer.stop()
+        threading.Thread(target=self.resources.reachSound.play).start()
         self.reStart()
 
 
