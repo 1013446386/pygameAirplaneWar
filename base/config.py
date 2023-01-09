@@ -22,7 +22,7 @@ class Config:
     DisplayWH = (1024, 1280)  # 窗口宽高
     DisplayBGPos = [(0, 0)]  # 背景图位置
     DisplayTitle = "飞机大战"  # 窗口标题
-    DisplayFPS = 60  # FPS
+    DisplayFPS = 120  # FPS
 
     MusicVolume = 0.33
     BiuVolume = 0.4

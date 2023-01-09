@@ -16,7 +16,7 @@ class Resources:
         self.sound_folder = os.path.join(Config.game_folder, 'resources/sounds')
         self.font_folder = os.path.join(Config.game_folder, 'resources/fonts')
         self.backgroundImg = pygame.image.load(os.path.join(self.img_folder, 'background1_mini.png')).convert()
-        self.ico = pygame.image.load(os.path.join(self.ico_folder, 'd5_64x64.ico')).convert_alpha()
+        self.ico = pygame.image.load(os.path.join(self.ico_folder, 'd5_128x128.ico')).convert_alpha()
         self.ico.set_colorkey(Color.BLACK)
 
         pygame.mixer_music.load(os.path.join(self.sound_folder, 'background.wav'))

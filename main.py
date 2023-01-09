@@ -11,6 +11,7 @@ from model.obstacle import Obstacle
 from model.player import Player
 import threading
 
+
 # 整体控制
 class Display:
 
@@ -99,7 +100,7 @@ class Display:
                     if not self.__pause:  # 如果是暂停状态则取消暂停
                         threading.Thread(target=self.launch).start()
                         # self.launch()  # 发射子弹函数
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_b or\
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_b or \
                         event.key == pygame.K_c or event.key == pygame.K_v:
                     if self.__pause:  # 如果是暂停状态则取消暂停
                         self.play()

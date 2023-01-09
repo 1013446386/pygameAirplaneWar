@@ -3,12 +3,12 @@
 
 block_cipher = None
 
-added_files = [('C:\\Users\\RpAi\\PycharmProjects\\pygameDemo\\resources', 'resources')]
+
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=added_files,
+    datas=[('resources', 'resources')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -41,5 +41,11 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Users\\RpAi\\PycharmProjects\\pygameDemo\\resources\\icon\\d9_128x128.ico'],
+    icon=['resources/icon/d5_64x64.ico'],
+)
+app = BUNDLE(
+    exe,
+    name='飞机大战.app',
+    icon='resources/icon/LOGO.icns',
+    bundle_identifier=None,
 )
