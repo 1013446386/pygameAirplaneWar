@@ -1,7 +1,6 @@
 import os
 
 import pygame
-from pygame.mixer import Sound
 
 from base.config import Config
 from .color import Color
@@ -27,7 +26,7 @@ class Resources:
         self.reachSound = pygame.mixer.Sound(os.path.join(self.sound_folder, 'reach.wav'))
         self.biuSound.set_volume(Config.BiuVolume)
         # 按钮图片
-        self.resumeImgList = self.pngImgToList(["resume_nor", "resume_pressed"])
+        self.resumeImgList = self.png_add_list(["resume_nor", "resume_pressed"])
 
         # 按钮使用的字体
         self.enFont = pygame.font.SysFont("si", 40)
@@ -35,19 +34,19 @@ class Resources:
 
         # 玩家资源
         # self.playerImgList = self.pngImgToList(["me3"])
-        self.playerImgList = self.pngImgToList(["me1"])
+        self.playerImgList = self.png_add_list(["me1"])
 
         # 子弹资源
-        self.bulletImgList = self.pngImgToList(["bullet1", "bullet2", "bomb"])
+        self.bulletImgList = self.png_add_list(["bullet1", "bullet2", "bomb"])
 
         # 障碍物资源
-        self.enemyImgList = self.pngImgToList(["enemy1", "enemy2", "enemy3_n1"])
+        self.enemyImgList = self.png_add_list(["enemy1", "enemy2", "enemy3_n1"])
 
-    def pngImgToList(self, ImgNameList, set_color_key=Color.BLACK):
+    def png_add_list(self, img_names, set_color_key=Color.BLACK):
         # 障碍物资源
-        List = []
-        for i in ImgNameList:
+        tmp = []
+        for i in img_names:
             img = pygame.image.load(os.path.join(self.img_folder, i + '.png')).convert()
             img.set_colorkey(set_color_key)
-            List.append(img)
-        return List
+            tmp.append(img)
+        return tmp

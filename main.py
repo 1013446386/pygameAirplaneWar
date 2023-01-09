@@ -45,22 +45,22 @@ class Display:
                                 self.play, self.resources.enFont, (255, 0, 0))
         # 玩家对象
         self.player = Player(self.resources.playerImgList, self.resources.killSound)
-        self.spritesAdd(self.allSprites, self.player)
-        self.newObstacle()  # 障碍物对象
+        self.sprites_to_group(self.allSprites, self.player)
+        self.new_obstacle()  # 障碍物对象
 
     # 生成障碍物
-    def newObstacle(self):
+    def new_obstacle(self):
         for i in range(Config.ObstacleCount):
-            self.spritesAdd(self.allObstacles, Obstacle(self.resources.enemyImgList, self.resources.boomSound))
+            self.sprites_to_group(self.allObstacles, Obstacle(self.resources.enemyImgList, self.resources.boomSound))
 
     # biu! biu! biu!!!
-    def launch(self):
+    def launch_bullet(self):
         if pygame.key.get_pressed()[pygame.K_SPACE]:  # 检测键盘按下了空格键
             threading.Thread(target=self.resources.biuSound.play).start()
-            self.spritesAdd(self.allBullets, Player.Bullet(self.player.rect.center, self.resources.bulletImgList))
+            self.sprites_to_group(self.allBullets, Player.Bullet(self.player.rect.center, self.resources.bulletImgList))
 
     # 塞进组里，直接写会有警告⚠
-    def spritesAdd(self, group: pygame.sprite.Group, obj):
+    def sprites_to_group(self, group: pygame.sprite.Group, obj):
         """
         会自动添加到全部对象组
         :param group:被添加的组
@@ -80,25 +80,25 @@ class Display:
         # pygame.mixer_music.unpause()
         pygame.mixer_music.play()
 
-    def reStart(self):
+    def restart(self):
         self.pause()
         # 重新开始
         for i in self.allObstacles:
             i.reStart()
         for i in self.allBullets:
             i.kill()
-        self.player.killMe()
-        self.player.reStart()
+        self.player.kill_me()
+        self.player.restart()
 
     # 监听按键事件
-    def keyEvent(self):
+    def key_event(self):
         for event in pygame.event.get():  # 循环获取事件，监听事件状态
             if event.type == pygame.QUIT:  # 退出程序
                 self.bey()
             elif event.type == pygame.KEYDOWN:  # 检测按键按下
                 if event.key == pygame.K_SPACE:  # 按下空格键
                     if not self.__pause:  # 如果是暂停状态则取消暂停
-                        threading.Thread(target=self.launch).start()
+                        threading.Thread(target=self.launch_bullet).start()
                         # self.launch()  # 发射子弹函数
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_b or \
                         event.key == pygame.K_c or event.key == pygame.K_v:
@@ -111,62 +111,62 @@ class Display:
                 mx, my = pygame.mouse.get_pos()  # 获得鼠标坐标
                 if event.type == pygame.MOUSEMOTION:  # 鼠标移动事件
                     # 判断鼠标是否移动到按钮范围内
-                    self.resumeBtn.getFocus(mx, my)
+                    self.resumeBtn.get_focus(mx, my)
                 elif event.type == pygame.MOUSEBUTTONDOWN:  # 鼠标按下
                     if pygame.mouse.get_pressed() == (1, 0, 0):  # 鼠标左键按下
-                        self.resumeBtn.mouseDown(mx, my)
+                        self.resumeBtn.mouse_down(mx, my)
                 elif event.type == pygame.MOUSEBUTTONUP:  # 鼠标弹起
-                    self.resumeBtn.mouseUp()
+                    self.resumeBtn.mouse_up()
 
     # 碰撞检测
     def collide(self):
-        collideDict = pygame.sprite.groupcollide(self.allObstacles, self.allBullets, False, Config.BulletKill)
-        for i in collideDict:
-            self.player.hitEvent()
-            self.scoreListening()
+        collide_dict = pygame.sprite.groupcollide(self.allObstacles, self.allBullets, False, Config.BulletKill)
+        for i in collide_dict:
+            self.player.hit_event()
+            self.score_event()
             i.collideMe()
 
-        collideList = pygame.sprite.spritecollide(self.player, self.allObstacles, False)
-        for o in collideList:
+        collide_list = pygame.sprite.spritecollide(self.player, self.allObstacles, False)
+        for o in collide_list:
             o.collideMe()
-            if self.player.collideEvent() == self.player.PlayerState.Death:
-                self.reStart()
+            if self.player.collide_event() == self.player.PlayerState.Death:
+                self.restart()
 
     def draw(self):
         for i in Config.DisplayBGPos:
             # 更新屏幕背景 （不更新会有残影）
             self.screen.blit(self.resources.backgroundImg, i)
         self.allSprites.draw(self.screen)  # 绘制到屏幕
-        self.pauseDraw()
-        self.infoDraw()
+        self.draw_pause()
+        self.draw_info()
 
-    def infoDraw(self):
+    def draw_info(self):
         img = self.resources.chFont.render("帧率:" + str(int(self.clock.get_fps())), True, Color.WHITE)
         self.screen.blit(img, Config.FPSPos)
-        hpImage = self.resources.chFont.render("血量:" + str(self.player.HP), True, Color.WHITE)
-        self.screen.blit(hpImage, Config.HPPos)
-        scoreImage = self.resources.chFont.render("分数:" + str(self.player.score), True, Color.WHITE)
-        self.screen.blit(scoreImage, Config.ScorePos)
-        scoreMaxImage = self.resources.chFont.render("目标:" + str(Config.PlayerScoreMax), True, Color.WHITE)
-        self.screen.blit(scoreMaxImage, Config.ScoreMaxPos)
+        hp_image = self.resources.chFont.render("血量:" + str(self.player.HP), True, Color.WHITE)
+        self.screen.blit(hp_image, Config.HPPos)
+        score_image = self.resources.chFont.render("分数:" + str(self.player.score), True, Color.WHITE)
+        self.screen.blit(score_image, Config.ScorePos)
+        score_max_image = self.resources.chFont.render("目标:" + str(Config.PlayerScoreMax), True, Color.WHITE)
+        self.screen.blit(score_max_image, Config.ScoreMaxPos)
 
-    def pauseDraw(self):
+    def draw_pause(self):
         if self.__pause:
             # self.screen.blit(self.resources.resumeImg, (210, 327.5))
             self.resumeBtn.draw(self.screen)
 
-    def scoreListening(self):
+    def score_event(self):
         if self.player.score >= Config.PlayerScoreMax and self.player.state != self.player.PlayerState.Death:
-            self.reachScore()
+            self.game_reach()
 
     def loop(self):
         # 必须循环，不然游戏就没了!
         while self.__running:
             self.clock.tick(Config.DisplayFPS)  # 设置每秒刷新帧数，不大于该值 但性能不足时会小于该值
-            self.keyEvent()
+            self.key_event()
             if not self.__pause:
                 if Config.Le:
-                    self.launch()  # 不建议启用 发射频率与帧率相关，同时打开函数内按键按下检测
+                    self.launch_bullet()  # 不建议启用 发射频率与帧率相关，同时打开函数内按键按下检测
 
                 # 调用所有对象的update函数
                 self.allSprites.update()
@@ -182,11 +182,11 @@ class Display:
         pygame.quit()  # 卸载所有模块
         sys.exit()  # 终止程序，确保退出程序
 
-    def reachScore(self):
+    def game_reach(self):
         self.player.state = self.player.PlayerState.Reach
         pygame.mixer.stop()
         threading.Thread(target=self.resources.reachSound.play).start()
-        self.reStart()
+        self.restart()
 
 
 if __name__ == '__main__':

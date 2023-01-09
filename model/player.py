@@ -10,11 +10,11 @@ from base.config import Config
 class Player(pygame.sprite.Sprite):
     # 子弹类
     class Bullet(pygame.sprite.Sprite):
-        def __init__(self, centerXY, bulletImg: list):
+        def __init__(self, center_pos, bullet_img: list):
             pygame.sprite.Sprite.__init__(self)
-            self.image = random.choice(bulletImg)
+            self.image = random.choice(bullet_img)
             self.rect = self.image.get_rect()
-            self.rect.center = centerXY
+            self.rect.center = center_pos
 
         def collide(self):
             if self.rect.bottom < 0:
@@ -30,11 +30,11 @@ class Player(pygame.sprite.Sprite):
         Injured = 3
         Death = 4
 
-    def __init__(self, playerImgList, sound: pygame.mixer.Sound):
+    def __init__(self, player_images, sound: pygame.mixer.Sound):
         pygame.sprite.Sprite.__init__(self)
         # self.image = pygame.Surface((50, 50))
         # self.image.fill(Color.GREEN)
-        self.playerImgList = playerImgList
+        self.playerImgList = player_images
         self.image = random.choice(self.playerImgList)
         self.rect = self.image.get_rect()
         # 对象x轴中心点
@@ -47,7 +47,7 @@ class Player(pygame.sprite.Sprite):
         self.state = Player.PlayerState.Max
         self.score = 0
 
-    def reStart(self):
+    def restart(self):
         # 对象x轴中心点
         self.rect.centerx = Config.PlayerInitPos.x
         self.rect.bottom = Config.PlayerInitPos.y
@@ -57,16 +57,16 @@ class Player(pygame.sprite.Sprite):
 
     def move(self):
         # 检测按键按下
-        keyPressed = pygame.key.get_pressed()
-        if keyPressed[pygame.K_RIGHT] or keyPressed[pygame.K_d]:
+        key_pressed = pygame.key.get_pressed()
+        if key_pressed[pygame.K_RIGHT] or key_pressed[pygame.K_d]:
             self.rect.x += Config.PlayerSpeed.x
-        if keyPressed[pygame.K_LEFT] or keyPressed[pygame.K_a]:
+        if key_pressed[pygame.K_LEFT] or key_pressed[pygame.K_a]:
             self.rect.x -= Config.PlayerSpeed.x
 
-        if keyPressed[pygame.K_UP] or keyPressed[pygame.K_w]:
+        if key_pressed[pygame.K_UP] or key_pressed[pygame.K_w]:
             self.rect.y -= Config.PlayerSpeed.y
             self.image = self.image = random.choice(self.playerImgList)
-        if keyPressed[pygame.K_DOWN] or keyPressed[pygame.K_s]:
+        if key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_s]:
             self.rect.y += Config.PlayerSpeed.y
 
     def collide(self):
@@ -80,21 +80,21 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > Config.DisplayWH[1]:
             self.rect.bottom = Config.DisplayWH[1]
 
-    def hitEvent(self):
+    def hit_event(self):
         self.score += Config.PlayerAddScoreStep
 
-    def collideEvent(self):
+    def collide_event(self):
         self.HP -= Config.PlayerStepSubHP
         if self.HP > 0:
-            self.collideMe()
+            self.collide_me()
         else:
-            self.killMe()
+            self.kill_me()
         return self.state
 
-    def collideMe(self):
+    def collide_me(self):
         self.state = self.PlayerState.Injured
 
-    def killMe(self):
+    def kill_me(self):
         if self.state == self.PlayerState.Reach:
             return
         if self.state != self.PlayerState.Death:
