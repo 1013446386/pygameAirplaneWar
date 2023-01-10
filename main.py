@@ -84,7 +84,7 @@ class Display:
         self.pause()
         # 重新开始
         for i in self.allObstacles:
-            i.reStart()
+            i.restart()
         for i in self.allBullets:
             i.kill()
         self.player.kill_me()
@@ -124,11 +124,11 @@ class Display:
         for i in collide_dict:
             self.player.hit_event()
             self.score_event()
-            i.collideMe()
+            i.collide_me()
 
         collide_list = pygame.sprite.spritecollide(self.player, self.allObstacles, False)
         for o in collide_list:
-            o.collideMe()
+            o.collide_me()
             if self.player.collide_event() == self.player.PlayerState.Death:
                 self.restart()
 

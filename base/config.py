@@ -17,12 +17,12 @@ def get_dir_path():
 class Config:
     game_folder = get_dir_path()  # 获取运行路径
 
-    Le = False  # 无敌模式
+    Le = True  # 无敌模式
 
     DisplayWH = (1024, 1280)  # 窗口宽高
     DisplayBGPos = [(0, 0)]  # 背景图位置
     DisplayTitle = "飞机大战"  # 窗口标题
-    DisplayFPS = 120  # FPS
+    DisplayFPS = 60  # FPS
 
     MusicVolume = 0.33
     BiuVolume = 0.4
@@ -36,21 +36,21 @@ class Config:
     PlayerInitPos.y = DisplayWH[1] - 88
 
     PlayerHP = 100  # 血量
-    PlayerStepSubHP = 10  # 单次扣除血量
     if Le:
-        PlayerStepSubHP = 0
+        PlayerStepSubHP = 0  # 单次扣除血量
+        PlayerAddScoreStep = 10
+        ObstacleCount = 16  # 障碍物数量
 
-    PlayerAddScoreStep = 10
-    if Le:
-        PlayerAddScoreStep = 100
+    else:
+        PlayerStepSubHP = 10
+        PlayerAddScoreStep = 10
+        ObstacleCount = 255
+
     PlayerScoreMax = 13000
 
     BulletSpeedY = 7  # 子弹速度
     BulletKill = not Le  # 子弹击中目标后是否失效
 
-    ObstacleCount = 16  # 障碍物数量
-    if Le:
-        ObstacleCount = 255
     ObstacleSpeedRange = XoY()  # 障碍物移动速度区间
     ObstacleSpeedRange.x = (-2, 2)
     ObstacleSpeedRange.y = (3, 7)
