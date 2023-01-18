@@ -17,7 +17,7 @@ def get_dir_path():
 class Config:
     game_folder = get_dir_path()  # 获取运行路径
 
-    Le = True  # 无敌模式
+    Le = False  # 无敌模式
 
     DisplayWH = (1024, 1280)  # 窗口宽高
     DisplayBGPos = [(0, 0)]  # 背景图位置
@@ -44,7 +44,7 @@ class Config:
     else:
         PlayerStepSubHP = 10
         PlayerAddScoreStep = 10
-        ObstacleCount = 255
+        ObstacleCount = 16
 
     PlayerScoreMax = 13000
 
