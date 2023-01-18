@@ -15,6 +15,6 @@
 打包命令（用上面的生成二进制就可以）
 
 
-Windows:pyinstaller -i resources/icon/d5_64x64.ico --add-data resources:resources -Fw main.py
+Windows:pyinstaller -i resources/icon/d5_128x128.ico --add-data resources:resources -Fw main.py
 
 Mac:pyinstaller -i resources/icon/LOGO.icns --add-data resources:resources -Fw main.py
